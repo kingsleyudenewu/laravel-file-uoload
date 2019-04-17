@@ -11,6 +11,9 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+//Route::get('/', function () {
+//    return view('welcome');
+//});
+
+Route::get('/', 'FileUploadController@index')->name('upload.index');
+Route::post('/', 'FileUploadController@store')->name('upload.store');
