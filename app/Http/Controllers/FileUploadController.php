@@ -6,13 +6,14 @@ use App\FileUpload;
 use Illuminate\Http\Request;
 use Box\Spout\Reader\ReaderFactory;
 use Box\Spout\Common\Type;
-use Illuminate\Support\Facades\Storage;
-//use Importer;
 use Illuminate\Support\Facades\Validator;
+//use Knp\Snappy\Pdf;
 use Yajra\DataTables\Facades\DataTables;
-use PdfReport;
-use CSVReport;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\FileUploadExport;
+//use Barryvdh\DomPDF\Facade as PDF;
 
+use Barryvdh\Snappy\Facades\SnappyPdf;
 
 class FileUploadController extends Controller
 {
@@ -75,8 +76,10 @@ class FileUploadController extends Controller
                     $i++;
                 }
             }
-            echo "Total Rows : " . $i;
+
             $reader->close();
+
+        return redirect()->route('upload.index');
 
     }
 
@@ -84,10 +87,12 @@ class FileUploadController extends Controller
         return DataTables::of(FileUpload::all())->make(true);
     }
 
+
+
     public function csv_download(Request $request){
         $rules = [
             'field' => 'required|string',
-            'mode' => 'required|string'
+//            'mode' => 'required|string'
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -98,18 +103,77 @@ class FileUploadController extends Controller
         }
 
         if($request->field == 'reporting_region'){
-            $query = FileUpload::all()->orderBy('reporting_region');
+            $query = FileUpload::orderBy('reporting_region')->get();
         }
         elseif($request->field == 'product_title'){
-            $query = FileUpload::all()->orderBy('product_title');
+            $query = FileUpload::orderBy('product_title')->get();
         }
         elseif($request->field == 'container_title'){
-            $query = FileUpload::all()->orderBy('container_title');
-        }elseif($request->field == 'reporting_region'){
-            $query = FileUpload::all()->orderBy('reporting_region');
-        }elseif($request->field == 'reporting_region'){
-            $query = FileUpload::all()->orderBy('reporting_region');
+            $query = FileUpload::orderBy('container_title')->get();
         }
+        elseif($request->field == 'content_provider'){
+            $query = FileUpload::orderBy('content_provider')->get();
+        }
+        elseif($request->field == 'artist'){
+            $query = FileUpload::orderBy('artist')->get();
+        }
+
+        $pdf = SnappyPdf::loadView('myPdf', compact('query'));
+        return $pdf->download('njo.pdf');
+
+
+
+//        return Excel::download(new FileUploadExport, 'new_file.xlsx');
+
+
+
+//        $columns = [
+//            'Reporting Region' => 'reporting_region',
+//            'start_date' => 'start_date',
+//            'end_date' => 'end_date',
+//            'upc' => 'upc',
+//            'grid' => 'grid',
+//            'isrc' => 'isrc',
+//            'custom_id_1' => 'custom_id_1',
+//            'custom_id_2' => 'custom_id_2',
+//            'custom_id_3' => 'custom_id_3',
+//            'custom_id_4' => 'custom_id_4',
+//            'google_id' => 'google_id',
+//            'artist' => 'artist',
+//            'product_title' => 'product_title',
+//            'container_title' => 'container_title',
+//            'content_provider' => 'content_provider',
+//            'label' => 'label',
+//            'consumer_country' => 'consumer_country',
+//            'device_type' => 'device_type',
+//            'product_type' => 'product_type',
+//            'interaction_type' => 'interaction_type',
+//            'Total Play' => 'total_play',
+//            'Partner Revenue Paid' => 'partner_revenue_paid',
+//            'Partner Revenue Currency' => 'partner_revenue_currency',
+//            'Amount' => 'eur_amount'
+//        ];
+//
+//        $title = 'NJO Report';
+//
+//        if($request->field == 'reporting_region'){
+//            $query = FileUpload::orderBy('reporting_region')->get();
+//        }
+//        elseif($request->field == 'product_title'){
+//            $query = FileUpload::orderBy('product_title')->get();
+//        }
+//        elseif($request->field == 'container_title'){
+//            $query = FileUpload::orderBy('container_title')->get();
+//        }
+//        elseif($request->field == 'content_provider'){
+//            $query = FileUpload::orderBy('content_provider')->get();
+//        }
+//        elseif($request->field == 'artist'){
+//            $query = FileUpload::orderBy('artist')->get();
+//        }
+//
+////        return CSVReport::of($title, null, $query, $columns)->simple()->download('test_njo');
+//        PdfReport::of($title, null, $query, $columns)->limit(20)->download('new_name');
 
 
     }

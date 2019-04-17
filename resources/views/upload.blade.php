@@ -34,18 +34,22 @@
                                 </div>
 
                                 <div class="col-sm-8">
-                                    <div class="form-group">
-                                        <select name="field" id="field" class="form-control">
-                                            <option value="" disabled>Sort By</option>
-                                            <option value="reporting_region">Reporting Region</option>
-                                            <option value="product_title">Product Title</option>
-                                            <option value="container_title">Container Title</option>
-                                            <option value="content_provider">Content Provider</option>
-                                            <option value="artist">Artist</option>
-                                        </select>
-                                    </div>
-                                    <button type="button" id="csv" class="btn btn-primary pull-right">Download CSV</button>
-                                    <button type="button" id="pdf" class="btn btn-success pull-right">Download PDF</button>
+                                    <form action="{{ route('csv.download') }}" method="post">
+                                        @csrf
+                                        <div class="form-group">
+                                            <select name="field" id="field" class="form-control">
+                                                <option value="" disabled>Sort By</option>
+                                                <option value="reporting_region">Reporting Region</option>
+                                                <option value="product_title">Product Title</option>
+                                                <option value="container_title">Container Title</option>
+                                                <option value="content_provider">Content Provider</option>
+                                                <option value="artist">Artist</option>
+                                            </select>
+                                        </div>
+                                        <button type="submit" name="mode" id="csv" class="btn btn-primary pull-right">Download CSV</button>
+                                        <button type="submit" name="mode" id="pdf" class="btn btn-success pull-right">Download PDF</button>
+                                    </form>
+
                                 </div>
                             </div>
                             <div class="table-responsive m-t-40">
@@ -100,19 +104,19 @@
                 ]
             });
 
-            $('#csv').click(function () {
-                $.ajax({
-                    type: 'post',
-                    url: "{{ route('csv.download') }}",
-                    data: {
-                        'mode': 'csv',
-                        'field': $('field').val()
-                    },
-                    success: function(data) {
-                        window.location.href = "{{ route('upload.index') }}";
-                    }
-                });
-            });
+            {{--$('#csv').click(function () {--}}
+                {{--$.ajax({--}}
+                    {{--type: 'post',--}}
+                    {{--url: "{{ route('csv.download') }}",--}}
+                    {{--data: {--}}
+                        {{--'mode': 'csv',--}}
+                        {{--'field': $('field').val()--}}
+                    {{--},--}}
+                    {{--success: function(data) {--}}
+                        {{--window.location.href = "{{ route('upload.index') }}";--}}
+                    {{--}--}}
+                {{--});--}}
+            {{--});--}}
         });
     </script>
 @endsection
