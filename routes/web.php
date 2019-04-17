@@ -11,9 +11,10 @@
 |
 */
 
-//Route::get('/', function () {
-//    return view('welcome');
-//});
+
 
 Route::get('/', 'FileUploadController@index')->name('upload.index');
+Route::get('/all_uploads', 'FileUploadController@all_uploads')->name('all_uploads');
+Route::get('/csv_download', 'FileUploadController@csv_download')->name('csv.download');
+Route::get('/pdf_download', 'FileUploadController@pdf_download')->name('pdf.download');
 Route::post('/', 'FileUploadController@store')->name('upload.store');

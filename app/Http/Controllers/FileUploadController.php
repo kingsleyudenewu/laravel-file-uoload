@@ -9,6 +9,10 @@ use Box\Spout\Common\Type;
 use Illuminate\Support\Facades\Storage;
 //use Importer;
 use Illuminate\Support\Facades\Validator;
+use Yajra\DataTables\Facades\DataTables;
+use PdfReport;
+use CSVReport;
+
 
 class FileUploadController extends Controller
 {
@@ -27,31 +31,15 @@ class FileUploadController extends Controller
             flash($validator->errors())->error();
             return redirect()->route('upload.index');
         }
-//        try {
-//            $fileName = $request->file('file_upload')->getClientOriginalName();
-
             $file_path = $request->file('file_upload')->store('upload');
-
-//        if(Storage::disk('local')->exists('file.txt')) return 'true';
-//        else return 'false';
-
-//            $excel = Importer::make('Excel');
-//            $excel->load($request->file('file_upload'));
-//            $collection = $excel->getCollection();
-//            dd($collection);
-
 
 
             $reader = ReaderFactory::create(Type::XLSX); //set Type file xlsx
             $reader->open($request->file('file_upload')); //open the file
-
-            $val = [];
             $i = 0;
 
             foreach ($reader->getSheetIterator() as $sheet) {
                 foreach ($sheet->getRowIterator() as $key => $row) {
-                    // do stuff with the row
-//                    $val[] = $row;
                     if ($key === 1) {
                         continue;
                     }
@@ -89,11 +77,40 @@ class FileUploadController extends Controller
             }
             echo "Total Rows : " . $i;
             $reader->close();
-//        }
-//        catch (\Exception $exception){
-//            flash('Operation Failed')->error();
-//            return redirect()->route('upload.index');
-//        }
+
+    }
+
+    public function all_uploads(){
+        return DataTables::of(FileUpload::all())->make(true);
+    }
+
+    public function csv_download(Request $request){
+        $rules = [
+            'field' => 'required|string',
+            'mode' => 'required|string'
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails())
+        {
+            flash($validator->errors())->error();
+            return redirect()->route('upload.index');
+        }
+
+        if($request->field == 'reporting_region'){
+            $query = FileUpload::all()->orderBy('reporting_region');
+        }
+        elseif($request->field == 'product_title'){
+            $query = FileUpload::all()->orderBy('product_title');
+        }
+        elseif($request->field == 'container_title'){
+            $query = FileUpload::all()->orderBy('container_title');
+        }elseif($request->field == 'reporting_region'){
+            $query = FileUpload::all()->orderBy('reporting_region');
+        }elseif($request->field == 'reporting_region'){
+            $query = FileUpload::all()->orderBy('reporting_region');
+        }
+
 
     }
 }
